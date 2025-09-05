@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Drowsiness Detection System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+        }
+
+        header h1 i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .video-section {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .video-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .video-container {
+            position: relative;
+            margin: 0 auto;
+            max-width: 800px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #video-feed {
+            width: 100%;
+            display: block;
+        }
+
+        #status-box {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            font-size: 0.9rem;
+        }
+
+        .features-section, .workflow-section, .team-section {
+            margin: 50px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            color: var(--dark-color);
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .features-grid, .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .feature-card, .team-card {
+            padding: 25px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover, .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        /* Workflow Styles */
+        .workflow-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .step {
+            text-align: center;
+            padding: 20px;
+            width: 200px;
+        }
+
+        .step-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .step h3 {
+            margin: 10px 0;
+            color: var(--dark-color);
+            font-size: 1.2rem;
+        }
+
+        .step p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .step-arrow {
+            font-size: 2rem;
+            color: var(--text-light);
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Team Styles */
+        .team-card {
+            text-align: center;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 15px;
+            border: 3px solid var(--secondary-color);
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .team-card p {
+            margin-bottom: 5px;
+            color: var(--text-light);
+        }
+
+        .team-card p i {
+            margin-right: 8px;
+            color: var(--secondary-color);
+        }
+
+        .social-links {
+            margin: 15px 0;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            color: var(--dark-color);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .step-arrow {
+                transform: rotate(90deg);
+                padding: 15px 0;
+            }
+            .workflow-steps {
+                flex-direction: column;
+            }
+            .step {
+                width: 100%;
+                max-width: 250px;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-car"></i> Driver Safety System</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="video-section">
+            <h2 class="section-title">Live Drowsiness Detection</h2>
+            <div class="video-container">
+                <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Real-time driver monitoring feed">
+                <div id="status-box">
+                    <i class="fas fa-spinner fa-spin"></i> System Active - Monitoring Driver
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: var(--text-light);">
+                Our system continuously analyzes driver's eye movements to detect signs of fatigue or drowsiness
+            </p>
+        </section>
+
+        <!-- Key Features Section -->
+        <section class="features-section">
+            <h2 class="section-title"><i class="fas fa-star"></i> Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Real-time Monitoring</h3>
+                    <p>Advanced computer vision tracks eye closure duration and blink frequency with 95% accuracy to detect early signs of drowsiness while driving.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Gradual Alert System</h3>
+                    <p>Progressive warning system with 3 audible beeps followed by a full alert if drowsiness persists, ensuring appropriate response time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Incident Logging</h3>
+                    <p>Comprehensive logging of all drowsiness events with timestamps and severity levels for post-drive analysis and safety reviews.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="workflow-section">
+            <h2 class="section-title"><i class="fas fa-cogs"></i> System Workflow</h2>
+            <div class="workflow-steps">
+                <!-- Step 1: Camera Input -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Camera Input</h3>
+                    <p>High-resolution dashboard camera captures real-time video of the driver's face and eye movements</p>
+                </div>
+
+                <div class="step-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+
+                <!-- Step 2: ML Model -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI Analysis</h3>
+                    <p>Deep learning model processes 30 frames per second to detect eye closure patterns and fatigue signs</p>
+                </div>
+
+                <div class="step-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+
+                <!-- Step 3: Decision System -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Decision Engine</h3>
+                    <p>Algorithm evaluates eye closure duration and frequency to determine drowsiness level</p>
+                </div>
+
+                <div class="step-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+
+                <!-- Step 4: Alert System -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Alert System</h3>
+                    <p>Immediate audio-visual alerts and optional emergency notifications if severe drowsiness detected</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="team-section">
+            <h2 class="section-title"><i class="fas fa-users"></i> Development Team</h2>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="profile-image">
+                        <img src="{{ url_for('static', filename='images/team1.jpg') }}" alt="Mohammed Nayeem"
+                            onerror="this.src='https://via.placeholder.com/150'">
+                    </div>
+                    <h3>M Mohammed Nayeem</h3>
+                    <p>Team Leader & Full Stack Developer</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Kurnool, India</p>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/mulla-mohammed-nayeem-09b33a361/" target="_blank"
+                            rel="noopener noreferrer" title="LinkedIn Profile">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://github.com/mmdnayeem4705" target="_blank" rel="noopener noreferrer" title="GitHub Profile">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                    <p><i class="fas fa-envelope"></i> mmdnayeem4705@gmail.com</p>
+                </div>
+                <div class="team-card">
+                    <div class="profile-image">
+                        <img src="{{ url_for('static', filename='images/team2.jpg') }}" alt="Sivamani Nandyala"
+                            onerror="this.src='https://via.placeholder.com/150'">
+                    </div>
+                    <h3>Sivamani Nandyala</h3>
+                    <p>Computer Vision Engineer</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Kurnool, India</p>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/sivamaninandyala/" target="_blank"
+                            rel="noopener noreferrer" title="LinkedIn Profile">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://github.com/Sivamanikant" target="_blank" rel="noopener noreferrer" title="GitHub Profile">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                    <p><i class="fas fa-envelope"></i> sivamaninandyala@gmail.com</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Driver Safety System | Developed for safer roads and accident prevention</p>
+        </div>
+    </footer>
+
+    <!-- Audio elements -->
+    <audio id="warning-sound" src="{{ url_for('static', filename='sounds/beep.wav') }}"></audio>
+    <audio id="alert-sound" src="{{ url_for('static', filename='sounds/alert.wav') }}"></audio>
+
+    <script>
+        // Enhanced status updater
+        const statusBox = document.getElementById('status-box');
+        const updateStatus = (message, isWarning = false) => {
+            const icon = isWarning ? 'fa-exclamation-triangle' : 'fa-check-circle';
+            statusBox.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            statusBox.style.color = isWarning ? '#e74c3c' : '#2ecc71';
+            statusBox.style.fontWeight = isWarning ? 'bold' : 'normal';
+        };
+
+        // Initial status
+        updateStatus('System Active - Monitoring Driver');
+        
+        // Simulate status changes (for demo purposes)
+        setTimeout(() => {
+            updateStatus('Driver Alert - Possible Drowsiness Detected', true);
+        }, 8000);
+    </script>
+</body>
+</html>
